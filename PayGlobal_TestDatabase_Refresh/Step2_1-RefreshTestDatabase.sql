@@ -1,4 +1,3 @@
-
 :Connect SCG-CLSQLDEV1
 
 SELECT 'Connected to : ' + Name FROM sys.databases where name like '_NODE%'
@@ -96,15 +95,25 @@ EXEC xp_cmdshell  'DEL \\schain-dbk\SQLCluster\Initialization\BI_Reference.bak'
 SELECT 'Connected to : ' + Name FROM sys.databases where name like '_NODE%'
 GO
 
+
+:Connect SCG-CLSQLDEV2
+GO
+
+-- Drop database before restore
 USE [master]
+GO
+ALTER DATABASE [BI_Reference] SET OFFLINE WITH ROLLBACK IMMEDIATE
 GO
 DROP DATABASE [BI_Reference]
 GO
+ALTER DATABASE [Payglobal_Reference_Prod] SET OFFLINE WITH ROLLBACK IMMEDIATE
+GO
 DROP DATABASE [Payglobal_Reference_Prod]
+GO
+ALTER DATABASE [PGSC_Prod] SET OFFLINE WITH ROLLBACK IMMEDIATE
 GO
 DROP DATABASE [PGSC_Prod]
 GO
-
 
 -- Re-Join database to HA Group 
 
@@ -124,13 +133,13 @@ GO
 
 :Connect SCG-CLSQLDEV1
 
-BACKUP LOG [BI_Reference] TO  DISK = N'\\SCHAIN-DBK\SQLCluster\Initialization\BI_Reference_20171017065355.trn' WITH NOFORMAT, NOINIT, NOSKIP, REWIND, NOUNLOAD, COMPRESSION,  STATS = 20
+BACKUP LOG [BI_Reference] TO  DISK = N'\\SCHAIN-DBK\SQLCluster\Initialization\BI_Reference.trn' WITH NOFORMAT, NOINIT, NOSKIP, REWIND, NOUNLOAD, COMPRESSION,  STATS = 20
 
 GO
 
 :Connect SCG-CLSQLDEV2
 
-RESTORE LOG [BI_Reference] FROM  DISK = N'\\SCHAIN-DBK\SQLCluster\Initialization\BI_Reference_20171017065355.trn' WITH  NORECOVERY,  NOUNLOAD,  STATS = 20
+RESTORE LOG [BI_Reference] FROM  DISK = N'\\SCHAIN-DBK\SQLCluster\Initialization\BI_Reference.trn' WITH  NORECOVERY,  NOUNLOAD,  STATS = 20
 
 GO
 
@@ -315,6 +324,3 @@ EXEC xp_cmdshell  'DEL \\schain-dbk\SQLCluster\Initialization\PGSC_Prod.trn'
 
 
 GO
-
-
-
